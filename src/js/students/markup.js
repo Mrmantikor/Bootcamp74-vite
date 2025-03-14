@@ -33,15 +33,15 @@ export const getItemMarkUp = ({
           </li>`;
 };
 export const getItemMarkUpDetails = ({
-                                avatar,
-                                firstName,
-                                id,
-                                age,
-                                country,
-                                city,
-                                lastName,
-                                rating
-                              }) => {
+  avatar,
+  firstName,
+  id,
+  age,
+  country,
+  city,
+  lastName,
+  rating,
+}) => {
   const dateOfBirth = format(new Date(age), 'dd MMMM yy');
 
   return `<div class="photo-card" data-id=${id} >
@@ -49,6 +49,7 @@ export const getItemMarkUpDetails = ({
               src="${avatar}"
               alt="${firstName}"
             />
+             <button type="button" class="delete-btn js-delete-btn">&#9988;</button>
 
             <div class="wrapper">
               <div class="info" >
