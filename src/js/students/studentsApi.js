@@ -23,3 +23,15 @@ export const setStudent = student => {
     return response.json();
   });
 };
+
+export const deleteStudent = studentId => {
+  return fetch(`https://65d763b227d9a3bc1d7aea8d.mockapi.io/students/${studentId}`, {
+    method: 'DELETE',
+  }).then(response => {
+    if (!response.ok) {
+      throw new Error(response.message);
+    }
+
+    return response.json();
+  });
+}

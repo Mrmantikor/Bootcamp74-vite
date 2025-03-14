@@ -28,7 +28,7 @@ ol {
 }
 
 section {
-  padding: 100px 0;
+  padding: 50px 0;
   text-align: center;
 }
 
@@ -52,12 +52,15 @@ button.modal-open {
   border-radius: 5px;
   color: #fff;
   cursor: pointer;
-  font-size: 16px;
-  height: 36px;
-  padding: 8px 16px;
+  font-size: 30px;
+  height: 40px;
+  width: 40px;
   transition: background-color 0.3s;
 
-  margin-bottom: 60px;
+  border-radius: 50%;
+  position: absolute;
+  top: 10px;
+  right: 10px;
 }
 
 button.modal-open:hover {
@@ -106,15 +109,16 @@ img {
   position: absolute;
   top: 0;
   right: 0;
-
   border: none;
   cursor: pointer;
-  width: 30px;
-  height: 30px;
-  background-color: #1f41db;
+  width: 40px;
+  height: 40px;
+  background-color: #4e1919;
   color: red;
+  border-radius: 50%;
+  font-size: 30px;
+  padding: 0;
 }
-
 /* modal */
 
 .modal {
@@ -142,19 +146,6 @@ img {
   background-color: transparent;
   cursor: pointer;
   padding: 0;
-}
-
-button.modal-open {
-  background-color: #43b581;
-
-  border: none;
-  border-radius: 5px;
-  color: #fff;
-  cursor: pointer;
-  font-size: 16px;
-  height: 36px;
-  padding: 8px 16px;
-  transition: background-color 0.3s;
 }
 
 button.modal-open:hover {

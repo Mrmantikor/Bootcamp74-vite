@@ -1,11 +1,13 @@
 // https://65d763b227d9a3bc1d7aea8d.mockapi.io/students
 
-import { getStudents, setStudent } from './studentsApi';
+import { getStudents, setStudent, deleteStudent } from './studentsApi';
 import { refs } from './refs';
 import { getItemMarkUp } from './markup';
 import { instance } from './basicLightbox';
+import { modalTextContent } from './modalTextContent'
 
-refs.backdrop.classList.remove('is-hidden');
+instance.element().innerHTML = modalTextContent['spinner'];
+instance.show();
 getStudents()
   .then(students => {
     if (!students.length) {
@@ -21,11 +23,11 @@ getStudents()
     refs.errorInfo.classList.add('error');
     refs.errorInfo.textContent = 'something went wrong';
   })
-  .finally(() => refs.backdrop.classList.add('is-hidden'));
+  .finally(() => instance.close());
 
 refs.modalBtn.addEventListener('click', () => {
   instance.show();
-
+  instance.element().innerHTML = modalTextContent['form'];
   instance
     .element()
     .querySelector('.student-form')
@@ -42,8 +44,7 @@ refs.modalBtn.addEventListener('click', () => {
         city: city.value,
       };
 
-      instance.close();
-      refs.backdrop.classList.remove('is-hidden');
+      instance.element().innerHTML = modalTextContent['spinner'];
 
       setStudent(student)
         .then(student => {
@@ -55,11 +56,12 @@ refs.modalBtn.addEventListener('click', () => {
           }
         })
         .catch(err => {
+          console.log(err);
           refs.errorInfo.classList.remove('is-hidden');
           refs.errorInfo.classList.add('error');
-          refs.errorInfo.textContent = 'something went wrong';
+          refs.errorInfo.textContent = `something went wrong. ${err.message}`;
         })
-        .finally(() => refs.backdrop.classList.add('is-hidden'));
+        .finally(() => instance.close());
     });
 });
 
@@ -70,7 +72,14 @@ refs.galleryList.addEventListener('click', e => {
   }
 
   const item = target.closest('.photo-card');
-  item.remove();
 
-  console.log(target.dataset.id);
+  deleteStudent(target.dataset.id)
+    .then(() => {
+      item.remove();
+    })
+    .catch(err => {
+      refs.errorInfo.classList.remove('is-hidden');
+      refs.errorInfo.classList.add('error');
+      refs.errorInfo.textContent = 'something went wrong';
+    });
 });
