@@ -35,3 +35,15 @@ export const deleteStudent = studentId => {
     return response.json();
   });
 }
+
+export const getStudentByID = studentID =>{
+  return fetch(`https://65d763b227d9a3bc1d7aea8d.mockapi.io/students/${studentID}`).then(
+    response => {
+      if (!response.ok) {
+        throw new Error(response.message);
+      }
+
+      return response.json();
+    }
+  );
+}

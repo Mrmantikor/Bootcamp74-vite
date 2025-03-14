@@ -1,8 +1,8 @@
 // https://65d763b227d9a3bc1d7aea8d.mockapi.io/students
 
-import { getStudents, setStudent, deleteStudent } from './studentsApi';
+import { getStudents, setStudent, deleteStudent, getStudentByID } from './studentsApi';
 import { refs } from './refs';
-import { getItemMarkUp } from './markup';
+import { getItemMarkUp, getItemMarkUpDetails } from './markup';
 import { instance } from './basicLightbox';
 import { modalTextContent } from './modalTextContent'
 
@@ -66,20 +66,31 @@ refs.modalBtn.addEventListener('click', () => {
 });
 
 refs.galleryList.addEventListener('click', e => {
-  const { target } = e;
-  if (!target.classList.contains('js-delete-btn')) {
+  if(e.target.nodeName === "UL") return;
+  const item = e.target.closest('.photo-card');
+
+  instance.element().innerHTML = modalTextContent['spinner'];
+  instance.show()
+
+  if (e.target.classList.contains('js-delete-btn')) {
+    deleteStudent(item.dataset.id)
+      .then(() => {
+        item.remove();
+      })
+      .catch(err => {
+        refs.errorInfo.classList.remove('is-hidden');
+        refs.errorInfo.classList.add('error');
+        refs.errorInfo.textContent = 'something went wrong';
+      })
+      .finally(()=> instance.close());
     return;
   }
 
-  const item = target.closest('.photo-card');
-
-  deleteStudent(target.dataset.id)
-    .then(() => {
-      item.remove();
-    })
+  getStudentByID(item.dataset.id).then(data => instance.element().innerHTML = getItemMarkUpDetails(data))
     .catch(err => {
-      refs.errorInfo.classList.remove('is-hidden');
-      refs.errorInfo.classList.add('error');
-      refs.errorInfo.textContent = 'something went wrong';
-    });
+      instance.element().innerHTML = `<p class="empty-students error">
+          We cannot receive any info about the student...
+        </p>`
+      setTimeout(() => instance.close(), 1500)
+    })
 });
