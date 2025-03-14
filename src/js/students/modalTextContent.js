@@ -1,6 +1,6 @@
 export const modalTextContent = {
-    spinner: '<span class="loader"></span>',
-    form: `
+  spinner: '<span class="loader"></span>',
+  form: `
 	<div class="modal">
     <form class="student-form">
       <input name="firstName" placeholder="firstName*" type="text" value="mango" required />
@@ -13,4 +13,7 @@ export const modalTextContent = {
     </form>
     </div>
 `,
+  error: `<p class="empty-students error">
+          We cannot receive any info about the student...
+        </p>`,
 };
