@@ -21,26 +21,27 @@ const onSubmit = async function (e) {
     return;
   }
   refs.loader.classList.remove('is-hidden');
-  refs.loadmore.classList.add('is-hidden');
+
   try {
     const { photos, per_page, total_results } = await fetchPhotos(query, page);
 
     if (!photos.length) {
-      refs.loadmore.classList.add('is-hidden');
       refs.gallery.innerHTML = '';
       showMessage("We don't found photos matching your query", 'error');
       return;
     }
 
     totalPages = Math.ceil(total_results / per_page);
-    if (page < totalPages) {
-      refs.loadmore.classList.remove('is-hidden');
-    }
 
     showMessage('We found photos matching your query', 'success');
 
     const markup = createMarkup(photos);
     refs.gallery.innerHTML = markup;
+
+    if (page < totalPages) {
+      const lastItem = refs.gallery.children[refs.gallery.children.length - 1];
+      observer.observe(lastItem);
+    }
 
     lightbox.refresh();
   } catch (error) {
@@ -58,6 +59,44 @@ const showMessage = function (message, type = 'info') {
     position: 'topRight',
   });
 };
+
+const options = {
+  root: null,
+  rootMargin: '100px',
+  threshold: 1.0,
+};
+
+const callback = (entries, observer) => {
+  entries.forEach(async entry => {
+    if (entry.isIntersecting) {
+      observer.unobserve(entry.target);
+
+      page++;
+
+      refs.loader.classList.remove('is-hidden');
+
+      try {
+        const { photos } = await fetchPhotos(query, page);
+        const markup = createMarkup(photos);
+        refs.gallery.insertAdjacentHTML('beforeend', markup);
+        lightbox.refresh();
+
+        if (page < totalPages) {
+          const lastItem =
+            refs.gallery.children[refs.gallery.children.length - 1];
+          observer.observe(lastItem);
+        }
+      } catch (error) {
+        showMessage(`Something went wrong ${error.message}`, 'error');
+      } finally {
+        refs.loader.classList.add('is-hidden');
+      }
+    }
+  });
+};
+
+const observer = new IntersectionObserver(callback, options);
+
 refs.loadmore.addEventListener('click', async () => {
   page++;
 
@@ -71,12 +110,6 @@ refs.loadmore.addEventListener('click', async () => {
     const { photos } = await fetchPhotos(query, page);
     const markup = createMarkup(photos);
     refs.gallery.insertAdjacentHTML('beforeend', markup);
-    const itemHeight = refs.gallery.children[0].getBoundingClientRect().height;
-
-    // window.scrollBy({ top: itemHeight * 2, behavior: 'smooth', });
-
-    smoothScrollBy(itemHeight * 2, 1000);
-
     lightbox.refresh();
   } catch (error) {
     showMessage(`Something went wrong ${error.message}`, 'error');
@@ -84,32 +117,3 @@ refs.loadmore.addEventListener('click', async () => {
     refs.loader.classList.add('is-hidden');
   }
 });
-
-const smoothScrollBy = (targetScroll, duration) => {
-  const start = window.scrollY;
-  const startTime = performance.now();
-
-  const animateScroll = currentTime => {
-    const elapsedTime = currentTime - startTime;
-    const progress = Math.min(elapsedTime / duration, 1);
-
-    const easeOutCubic = t => 1 - Math.pow(1 - t, 3);
-
-    const newPosition = start + targetScroll * easeOutCubic(progress);
-    window.scrollTo(0, newPosition);
-
-    if (progress < 1) {
-      requestAnimationFrame(animateScroll);
-    }
-  };
-
-  requestAnimationFrame(animateScroll);
-};
-
-// const scrollSmoothly = () => {
-//   const firstCard = document.querySelector('.gallery-item');
-//   if (!firstCard) return;
-
-//   const cardHeight = firstCard.getBoundingClientRect().height;
-//   smoothScrollBy(cardHeight * 2, 600);
-// };
